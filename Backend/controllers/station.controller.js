@@ -18,7 +18,7 @@ module.exports.getNearbyStations = async (req, res) => {
         $maxDistance: parseInt(radius),
       },
     },
-  }).limit(20);
+  }).limit(200);
 
   res.status(200).json({
     success: true,
