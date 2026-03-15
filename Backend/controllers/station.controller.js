@@ -1,12 +1,15 @@
 const EVStation = require("../models/evStation.model");
-const expressError = require("../utils/expressError");
+const ExpressError = require("../utils/ExpressError");
 
 module.exports.getNearbyStations = async (req, res) => {
-  const { lat, lng, radius = 5000 } = req.query;
+  const { lat, lng, radius = 5000, page = 1 } = req.query;
 
   if (!lat || !lng) {
-    throw new expressError(400, "Latitude and longitude are required");
+    throw new ExpressError(400, "Latitude and longitude are required");
   }
+
+  const limit = 20;
+  const skip = (page - 1) * limit;
 
   const stations = await EVStation.find({
     location: {
@@ -18,11 +21,35 @@ module.exports.getNearbyStations = async (req, res) => {
         $maxDistance: parseInt(radius),
       },
     },
-  }).limit(200);
+  })
+    .skip(skip)
+    .limit(limit);
+
+  const totalStations = await EVStation.countDocuments();
 
   res.status(200).json({
     success: true,
-    count: stations.length,
+    page: Number(page),
+    results: stations.length,
+    total: totalStations,
+    stations,
+  });
+};
+
+module.exports.getStationById = async (req, res) => {
+  const station = await EVStation.findById(req.params.id);
+
+  res.status(200).json({
+    success: true,
+    station,
+  });
+};
+
+module.exports.getAllStationsForMap = async (req, res) => {
+  const stations = await EVStation.find({});
+
+  res.status(200).json({
+    success: true,
     stations,
   });
 };

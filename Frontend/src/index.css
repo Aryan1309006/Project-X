@@ -1,13 +1,37 @@
 @import "tailwindcss";
 
 @theme {
-    --font-sans: "Poppins", sans-serif;
+  --font-sans: "Poppins", sans-serif;
+
+  --animate-fade-in-up: fadeInUp 0.4s ease forwards;
+
+  @keyframes fadeInUp {
+    0% {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
 
 .nav-link {
-    @apply bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent font-semibold transition-all duration-300 hover:brightness-110 hover:scale-105;
+  @apply bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent font-semibold transition-all duration-300 hover:brightness-110 hover:scale-105;
 }
 
 .btn-green {
-    @apply bg-gradient-to-t from-emerald-400 to-teal-600 text-white px-4 py-2 cursor-pointer rounded-lg transition hover:brightness-110 hover:scale-105;
+  @apply bg-gradient-to-t from-emerald-400 to-teal-600 text-white px-4 py-2 cursor-pointer rounded-lg transition hover:brightness-110 hover:scale-105;
+}
+
+/* Mapbox popup overrides */
+.ev-popup .mapboxgl-popup-content {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.ev-popup .mapboxgl-popup-tip {
+  border-top-color: rgba(16, 185, 129, 0.25) !important;
 }
