@@ -39,9 +39,7 @@ import NotFound from "./components/NotFound";
 function App() {
   return (
     <BrowserRouter>
-      {/* Navbar */}
       <Navbar />
-
       <Routes>
         {/* Landing Page */}
         <Route
@@ -54,37 +52,28 @@ function App() {
             </main>
           }
         />
-
         {/* Authentication */}
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Login />} />
-
         {/* Stations */}
         <Route path="/stations" element={<StationList />} />
-        <Route path="/station/:id" element={<StationDetail />} />
-
+        <Route path="/station/:id" element={<StationDetail />} />{" "}
         {/* User */}
         <Route path="/profile" element={<UserProfile />} />
-
         {/* Station Management */}
         <Route path="/add-station" element={<AddStation />} />
         <Route path="/verification" element={<Verification />} />
-
         {/* Admin */}
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/manage-stations" element={<ManageStations />} />
         <Route path="/manage-users" element={<ManageUsers />} />
-
         {/* Footer Pages */}
         <Route path="/guide" element={<Guide />} />
         <Route path="/charging-tips" element={<ChargingTips />} />
         <Route path="/contact" element={<Contact />} />
-
         {/* 404 */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-
-      {/* Footer */}
       <Footer />
     </BrowserRouter>
   );

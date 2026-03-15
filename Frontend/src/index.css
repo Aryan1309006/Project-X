@@ -25,6 +25,24 @@
   @apply bg-gradient-to-t from-emerald-400 to-teal-600 text-white px-4 py-2 cursor-pointer rounded-lg transition hover:brightness-110 hover:scale-105;
 }
 
+/* Prevent Mapbox markers from bleeding outside their container */
+.mapboxgl-canvas-container,
+.mapboxgl-canvas {
+  border-radius: inherit;
+}
+
+.mapboxgl-marker {
+  will-change: transform;
+}
+
+/* Clip the entire map wrapper */
+.map-clip-wrapper {
+  overflow: hidden;
+  border-radius: 0; /* inherits from parent rounding */
+  position: relative;
+}
+
+
 /* Mapbox popup overrides */
 .ev-popup .mapboxgl-popup-content {
   background: transparent !important;
@@ -34,4 +52,10 @@
 
 .ev-popup .mapboxgl-popup-tip {
   border-top-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% center; }
+  50%  { background-position: 100% center; }
+  100% { background-position: 0% center; }
 }
