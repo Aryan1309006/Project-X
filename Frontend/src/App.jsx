@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import Chatbot from "./components/Chatbot";
 
 /* Landing */
 import Hero from "./components/landing_page/Hero";
@@ -44,52 +45,55 @@ import BookSlot from "./components/After login/User/BookSlot";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        {/* Landing Page */}
-        <Route
-          path="/"
-          element={
-            <main className="flex-1">
-              <Hero />
-              <About />
-              <FAQ />
-              
-            </main>
-          }
-        />
-        {/* Authentication */}
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/login" element={<Login />} />
-        {/* Stations */}
-        <Route path="/stations" element={<StationList />} />
-        <Route path="/station/:id" element={<StationDetail />} />{" "}
-        {/* User */}
-        <Route path="/profile" element={<UserProfile />} />
-        <Route path="/book-slot" element={<BookSlot />} />
-        {/* Station Management */}
-        <Route path="/add-station" element={<AddStation />} />
-        <Route path="/verification" element={<Verification />} />
-        <Route path="/station-rejected" element={<RejectedStation/>} />
-        <Route path="/station-verified" element={<StationApproved/>} />
-        {/* Admin */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/manage-stations" element={<ManageStations />} />
-        <Route path="/manage-users" element={<ManageUsers />} />
-        {/* Footer Pages */}
-        <Route path="/guide" element={<Guide />} />
-        <Route path="/charging-tips" element={<ChargingTips />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/TermsOfService" element={<TermsOfService />} />
-        <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
-        <Route path="/HelpCenter" element={<HelpCenter />} />
-        
-        {/* 404 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Footer />
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          {/* Landing Page */}
+          <Route
+            path="/"
+            element={
+              <main className="flex-1">
+                <Hero />
+                <About />
+                <FAQ />
+
+              </main>
+            }
+          />
+          {/* Authentication */}
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/login" element={<Login />} />
+          {/* Stations */}
+          <Route path="/stations" element={<StationList />} />
+          <Route path="/station/:id" element={<StationDetail />} />{" "}
+          {/* User */}
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/book-slot" element={<BookSlot />} />
+          {/* Station Management */}
+          <Route path="/add-station" element={<AddStation />} />
+          <Route path="/verification" element={<Verification />} />
+          <Route path="/station-rejected" element={<RejectedStation />} />
+          <Route path="/station-verified" element={<StationApproved />} />
+          {/* Admin */}
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/manage-stations" element={<ManageStations />} />
+          <Route path="/manage-users" element={<ManageUsers />} />
+          {/* Footer Pages */}
+          <Route path="/guide" element={<Guide />} />
+          <Route path="/charging-tips" element={<ChargingTips />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/TermsOfService" element={<TermsOfService />} />
+          <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+          <Route path="/HelpCenter" element={<HelpCenter />} />
+
+          {/* 404 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Footer />
+      </BrowserRouter>
+      <Chatbot />
+    </>
   );
 }
 
