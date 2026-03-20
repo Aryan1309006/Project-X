@@ -59,3 +59,13 @@
   50%  { background-position: 100% center; }
   100% { background-position: 0% center; }
 }
+
+/* Hide scrollbar — still scrollable via mouse/touch */
+* {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari / Opera */
+}

@@ -17,7 +17,7 @@ function ScrollToTop() {
       className={`fixed bottom-8 left-8 z-50
                   w-11 h-11 rounded-full
                   bg-gradient-to-br from-emerald-500 to-teal-500
-                  text-white shadow-lg shadow-emerald-200
+                  text-white 
                   flex items-center justify-center
                   hover:scale-110 active:scale-95
                   transition-all duration-300
