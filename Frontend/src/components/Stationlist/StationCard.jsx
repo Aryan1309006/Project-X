@@ -25,8 +25,8 @@ function StationCard({ station, onClick }) {
 
   // Highest power
   const maxPower = chargers.length
-    ? Math.max(...chargers.map((c) => c.power || 0))
-    : null;
+  ? Number(Math.max(...chargers.map((charger) => charger.power || 0)).toFixed(2))
+  : null;
 
   const typeColors = {
     CCS: "bg-blue-50 border-blue-100 text-blue-600",
