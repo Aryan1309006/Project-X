@@ -19,7 +19,7 @@ function Footer() {
 
   const socials = [
     { icon: "fa-brands fa-twitter", label: "Twitter" },
-    { icon: "fa-brands fa-github", label: "GitHub" },
+    { icon: "fa-brands fa-instagram", label: "Instagram" },
     { icon: "fa-brands fa-linkedin", label: "LinkedIn" },
     { icon: "fa-regular fa-envelope", label: "Email" },
   ];
@@ -136,11 +136,11 @@ function Footer() {
                                    inline-flex items-center gap-1.5
                                    transition-all duration-200"
                       >
-                        <span
+                        {/* <span
                           className="w-1 h-1 rounded-full bg-emerald-500/0
                                          group-hover:bg-emerald-500
                                          transition-colors duration-200"
-                        />
+                        /> */}
                         {link.label}
                       </a>
                     ) : (
