@@ -18,7 +18,7 @@ function Footer() {
   ];
 
   const socials = [
-    { icon: "fa-brands fa-twitter", label: "Twitter", href: "https://x.com/Ev_Bharat", external: true },
+    { icon: "fa-brands fa-x-twitter", label: "Twitter", href: "https://x.com/Ev_Bharat", external: true },
     { icon: "fa-brands fa-instagram", label: "Instagram", href: "https://www.instagram.com/ev__bharat/", external: true },
     { icon: "fa-brands fa-linkedin", label: "LinkedIn", href: "https://www.linkedin.com/in/ev-bharat-6343033bb/", external: true },
     { icon: "fa-regular fa-envelope", label: "Email", href: "https://mail.google.com/mail/?view=cm&to=evbharatindia@gmail.com", external: true },
