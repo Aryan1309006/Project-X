@@ -1,3 +1,4 @@
+const reviewRoutes = require("./review.routes");
 const express = require("express");
 const router = express.Router();
 
@@ -8,6 +9,9 @@ const { protect, stationOwnerOnly } = require("../middleware/auth");
 router.get("/",       wrapAsync(stationController.getAllStations)); 
 router.get("/nearby", wrapAsync(stationController.getNearbyStations));
 router.get("/map", wrapAsync(stationController.getAllStationsForMap));
+
+router.use("/:stationId/reviews", reviewRoutes);
+
 router.get("/:id", wrapAsync(stationController.getStationById));    
 
 // station owner or admin can create

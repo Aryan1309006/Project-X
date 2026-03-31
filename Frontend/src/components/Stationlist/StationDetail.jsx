@@ -7,37 +7,39 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom"; // ← useParams added
+import { useNavigate, useParams } from "react-router-dom";
 import MapView from "./MapView";
 
 const facilityIconMap = {
-  wifi:     faWifi,
-  parking:  faParking,
-  cafe:     faUtensils,
-  food:     faUtensils,
+  wifi: faWifi,
+  parking: faParking,
+  cafe: faUtensils,
+  food: faUtensils,
   security: faShield,
   restroom: faRestroom,
-  toilet:   faRestroom,
+  toilet: faRestroom,
 };
 
 const chargerTypeColors = {
-  CCS:     { bg: "bg-blue-50",    border: "border-blue-200",    text: "text-blue-700"    },
-  CCS2:    { bg: "bg-blue-50",    border: "border-blue-200",    text: "text-blue-700"    },
-  CHAdeMO: { bg: "bg-orange-50",  border: "border-orange-200",  text: "text-orange-700"  },
-  Type2:   { bg: "bg-purple-50",  border: "border-purple-200",  text: "text-purple-700"  },
-  AC:      { bg: "bg-teal-50",    border: "border-teal-200",    text: "text-teal-700"    },
-  DC:      { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700" },
+  CCS: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700" },
+  CCS2: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700" },
+  CHAdeMO: { bg: "bg-orange-50", border: "border-orange-200", text: "text-orange-700" },
+  Type2: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700" },
+  AC: { bg: "bg-teal-50", border: "border-teal-200", text: "text-teal-700" },
+  DC: { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700" },
 };
 
 function StationDetail() {
   const navigate = useNavigate();
-  const { id } = useParams(); // ← reads /station/:id from URL
+  const { id } = useParams();
 
-  const [station,   setStation]   = useState(null);  // ← single station, not array
-  const [loading,   setLoading]   = useState(true);
+  const [station, setStation] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("ports");
-  const [imgError,  setImgError]  = useState(false);
-  const [visible,   setVisible]   = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -47,10 +49,10 @@ function StationDetail() {
       setLoading(true);
       try {
         const response = await fetch(
-          `http://localhost:8000/api/stations/${id}` // ← fetch by ID
+          `http://localhost:8000/api/stations/${id}`
         );
         const result = await response.json();
-        setStation(result.station || null); // ← single station
+        setStation(result.station || null);
       } catch (err) {
         console.error(err);
       } finally {
@@ -60,14 +62,27 @@ function StationDetail() {
     };
 
     fetchStation();
-  }, [id]); // ← re-runs whenever ID changes
+
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch(`http://localhost:8000/api/stations/${id}/reviews`);
+        const data = await res.json();
+        setReviews(data.reviews || []);
+      } catch (err) {
+        console.error("Reviews fetch error:", err);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+    fetchReviews();
+
+  }, [id]);
 
   // ── Loading ──
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
         <div className="relative w-16 h-16 mb-6">
-          {/* Outer ping ring */}
           <div className="absolute inset-0 rounded-full border-2
                           border-emerald-200 animate-ping opacity-30" />
           <div className="absolute inset-0 rounded-full border-4 border-emerald-100" />
@@ -112,11 +127,12 @@ function StationDetail() {
     );
   }
 
-  const chargers     = station.chargers || [];
-  const totalPorts   = chargers.reduce((sum, c) => sum + (c.ports || 1), 0);
-  const coverImage   = !imgError && station.mediaItems?.[0]?.itemURL;
+  const chargers = station.chargers || [];
+  // ✅ Fix 3 — c.totalPorts instead of c.ports
+  const totalPorts = chargers.reduce((sum, c) => sum + (c.totalPorts || 1), 0);
+  const coverImage = !imgError && station.mediaItems?.[0]?.itemURL;
   const chargerTypes = [...new Set(chargers.map(c => c.type).filter(Boolean))];
-  const maxPower     = chargers.length
+  const maxPower = chargers.length
     ? Math.max(...chargers.map(c => c.power || 0))
     : null;
 
@@ -140,9 +156,9 @@ function StationDetail() {
         <div className={`flex flex-col lg:flex-row gap-6 items-start
                          transition-all duration-700 ease-out
                          ${visible
-                           ? "opacity-100 translate-y-0"
-                           : "opacity-0 translate-y-4"
-                         }`}>
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-4"
+          }`}>
 
           {/* ── LEFT PANEL 30% ── */}
           <div className="w-full lg:w-[30%] flex flex-col gap-5">
@@ -194,14 +210,15 @@ function StationDetail() {
                     Operational
                   </div>
 
-                  {station.rating ? (
+                  {/* ✅ Fix 2 — station.averageRating instead of station.rating */}
+                  {station.averageRating ? (
                     <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl
                                     bg-amber-50 border border-amber-100
                                     hover:bg-amber-100 hover:scale-105
                                     transition-all duration-200 cursor-default">
                       <FontAwesomeIcon icon={faStar} className="text-amber-400 text-xs" />
                       <span className="text-amber-600 text-xs font-bold">
-                        {station.rating.toFixed(1)}
+                        {station.averageRating.toFixed(1)}
                       </span>
                     </div>
                   ) : (
@@ -248,7 +265,7 @@ function StationDetail() {
                     className="text-emerald-400 mt-0.5 shrink-0" />
                   <span>
                     {[station.address?.city, station.address?.state,
-                      station.address?.country].filter(Boolean).join(", ")
+                    station.address?.country].filter(Boolean).join(", ")
                       || "Location not available"}
                   </span>
                 </p>
@@ -260,15 +277,22 @@ function StationDetail() {
                 {/* Stats grid */}
                 <div className="grid grid-cols-3 gap-2.5 mb-5">
                   {[
-                    { icon: faPlug, value: chargerTypes.length || chargers.length,
-                      label: "Types",  iconColor: "text-emerald-500",
-                      bg: "bg-emerald-50 border-emerald-100" },
-                    { icon: faBolt, value: totalPorts,
-                      label: "Ports",  iconColor: "text-teal-500",
-                      bg: "bg-teal-50 border-teal-100" },
-                    { icon: faStar, value: station.rating ? `${station.rating.toFixed(1)}★` : "N/A",
+                    {
+                      icon: faPlug, value: chargerTypes.length || chargers.length,
+                      label: "Types", iconColor: "text-emerald-500",
+                      bg: "bg-emerald-50 border-emerald-100"
+                    },
+                    {
+                      icon: faBolt, value: totalPorts,
+                      label: "Ports", iconColor: "text-teal-500",
+                      bg: "bg-teal-50 border-teal-100"
+                    },
+                    {
+                      // ✅ Fix 2 — station.averageRating instead of station.rating
+                      icon: faStar, value: station.averageRating ? `${station.averageRating.toFixed(1)}★` : "N/A",
                       label: "Rating", iconColor: "text-amber-400",
-                      bg: "bg-amber-50 border-amber-100" },
+                      bg: "bg-amber-50 border-amber-100"
+                    },
                   ].map((stat) => (
                     <div key={stat.label}
                       className={`flex flex-col items-center justify-center
@@ -371,24 +395,25 @@ function StationDetail() {
 
               <div className="flex border-b border-gray-100 bg-gray-50/50">
                 {[
-                  { key: "ports",   label: "Charging Ports", count: chargers.length },
-                  { key: "reviews", label: "Reviews",        count: station.reviews?.length || 0 },
+                  { key: "ports", label: "Charging Ports", count: chargers.length },
+                  // ✅ Fix 1 — reviews.length instead of station.reviews?.length
+                  { key: "reviews", label: "Reviews", count: reviews.length },
                 ].map((tab) => (
                   <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                     className={`flex-1 flex items-center justify-center gap-2
                                 py-4 text-sm font-semibold relative
                                 transition-all duration-200
                                 ${activeTab === tab.key
-                                  ? "text-emerald-600 bg-white"
-                                  : "text-gray-400 hover:text-gray-600 hover:bg-white/60"
-                                }`}>
+                        ? "text-emerald-600 bg-white"
+                        : "text-gray-400 hover:text-gray-600 hover:bg-white/60"
+                      }`}>
                     {tab.label}
                     <span className={`px-2 py-0.5 rounded-full text-xs font-bold
                                       transition-all duration-200
                                       ${activeTab === tab.key
-                                        ? "bg-emerald-100 text-emerald-600"
-                                        : "bg-gray-100 text-gray-400"
-                                      }`}>
+                        ? "bg-emerald-100 text-emerald-600"
+                        : "bg-gray-100 text-gray-400"
+                      }`}>
                       {tab.count}
                     </span>
                     <span className={`absolute bottom-0 left-6 right-6 h-0.5
@@ -396,9 +421,9 @@ function StationDetail() {
                                       bg-gradient-to-r from-emerald-400 to-teal-500
                                       transition-all duration-300 ease-in-out
                                       ${activeTab === tab.key
-                                        ? "opacity-100 scale-x-100"
-                                        : "opacity-0 scale-x-0"
-                                      }`} />
+                        ? "opacity-100 scale-x-100"
+                        : "opacity-0 scale-x-0"
+                      }`} />
                   </button>
                 ))}
               </div>
@@ -458,9 +483,10 @@ function StationDetail() {
                                       {charger.power} kW
                                     </span>
                                   )}
-                                  {charger.ports && (
+                                  {/* ✅ Fix 3 — c.totalPorts instead of c.ports */}
+                                  {charger.totalPorts && (
                                     <span>
-                                      · {charger.ports} port{charger.ports !== 1 ? "s" : ""}
+                                      · {charger.totalPorts} port{charger.totalPorts !== 1 ? "s" : ""}
                                     </span>
                                   )}
                                 </div>
@@ -496,8 +522,13 @@ function StationDetail() {
                 {/* ── Reviews ── */}
                 {activeTab === "reviews" && (
                   <div className="space-y-3">
-                    {station.reviews?.length > 0 ? (
-                      station.reviews.map((review, index) => (
+                    {/* ✅ Fix 1 — reviewsLoading state + reviews state */}
+                    {reviewsLoading ? (
+                      <div className="flex justify-center py-10">
+                        <p className="text-gray-400 text-sm animate-pulse">Loading reviews...</p>
+                      </div>
+                    ) : reviews.length > 0 ? (
+                      reviews.map((review, index) => (
                         <div key={index}
                           className="p-4 rounded-xl border border-gray-100
                                      bg-gray-50/60 hover:bg-white

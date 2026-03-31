@@ -47,4 +47,13 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+userSchema.pre("findOneAndDelete", async function (next) {
+  const user = await this.model.findOne(this.getFilter());
+  if (user) {
+    const Review = require("mongoose").model("Review");
+    await Review.deleteMany({ userId: user._id });
+  }
+  next();
+});
+
 module.exports = userSchema;

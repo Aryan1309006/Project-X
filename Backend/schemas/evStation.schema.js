@@ -96,4 +96,14 @@ const evStationSchema = new mongoose.Schema(
 
 evStationSchema.index({ location: "2dsphere" });
 
+// Cascade delete reviews when station is deleted
+evStationSchema.pre("findOneAndDelete", async function (next) {
+  const station = await this.model.findOne(this.getFilter());
+  if (station) {
+    const Review = require("mongoose").model("Review");
+    await Review.deleteMany({ stationId: station._id });
+  }
+  next();
+});
+
 module.exports = evStationSchema;
