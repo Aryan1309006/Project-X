@@ -5,9 +5,4 @@ terminal 2:
     rasa run --enable-api --cors "*" --debug
 
 terminal 3:
-
-    For Python based code:
-    python -m http.server 8000 
-
-    For React based code:
-    npm run dev
+    python -m http.server 8000

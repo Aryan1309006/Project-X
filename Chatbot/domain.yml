@@ -1,19 +1,38 @@
 version: "3.1"
 
 intents:
+  # Basic intents
   - greet
   - goodbye
+  - ask_help
+  - out_of_scope
+  
+  # Search intents
   - find_station_by_city
-  - find_nearest_station
-  - get_station_details
-  - inform_location
-  - thank
-  - help
+  - find_station_by_state
+  - find_nearby_stations
+  - find_station_by_operator
+  - find_station_by_charger_type
+  - find_top_rated_stations
+  - find_fastest_charger
+  - find_verified_stations
+  
+  # Follow-up intents
+  - ask_charger_info
+  - ask_port_availability
+  - ask_amenities
+  - ask_rating
+  - ask_operator
+  - ask_verified
+  - ask_status
+  - select_station_from_list
 
 entities:
   - city
-  - station_name
-  - location
+  - state
+  - charger_type
+  - operator
+  - number
 
 slots:
   city:
@@ -23,58 +42,98 @@ slots:
     - type: from_entity
       entity: city
       
-  station_name:
+  state:
     type: text
     influence_conversation: true
     mappings:
     - type: from_entity
-      entity: station_name
+      entity: state
       
-  location:
+  charger_type:
+    type: categorical
+    values:
+    - CCS
+    - CCS2
+    - CHAdeMO
+    - Type2
+    - AC
+    - DC
+    mappings:
+    - type: from_entity
+      entity: charger_type
+      
+  operator:
     type: text
     influence_conversation: true
     mappings:
     - type: from_entity
-      entity: location
+      entity: operator
+      
+  current_station_id:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: custom
+      
+  current_station_name:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: custom
+      
+  selected_number:
+    type: text
+    influence_conversation: true
+    mappings:
+    - type: from_entity
+      entity: number
 
 responses:
   utter_greet:
-  - text: "Hello! I'm your EV Charging Station Assistant. How can I help you today?"
-  - text: "Hi there! I can help you find EV charging stations. Try asking 'Find stations in Pune' or 'What's the nearest station?'"
-
-  utter_goodbye:
-  - text: "Goodbye! Drive electric and stay charged!"
-  - text: "See you later! Happy charging!"
-
-  utter_ask_location:
-  - text: "Sure! Could you tell me your current city or share your location?"
-  - text: "I'd be happy to help! What city are you in right now?"
-
-  utter_ask_city:
-  - text: "Which city would you like to search for stations in?"
-  - text: "Please tell me the city name."
-
-  utter_ask_station_name:
-  - text: "Which station would you like details for? Please tell me the name."
-  - text: "Sure, what's the name of the station?"
-
-  utter_thank:
-  - text: "You're welcome! Happy to help with your EV needs!"
-  - text: "Glad I could assist! Drive safe!"
-
-  utter_help:
-  - text: "I can help you with:\n- Finding stations by city (e.g., 'Find stations in Pune')\n- Finding the nearest station (e.g., 'Nearest station')\n- Getting station details (e.g., 'Tell me about Nikol EV')\nWhat would you like to do?"
-
-  utter_no_stations:
-  - text: "Sorry, I couldn't find any stations in {city}. Would you like to try another city?"
+  - text: "Hey! I can help you find EV charging stations. Ask me anything!"
+  - text: "Hi there! Looking for EV charging stations? Just tell me what you need!"
   
-  utter_no_station_match:
-  - text: "Sorry, I couldn't find a station named '{station_name}'. Can you provide more details or try another name?"
-
-  utter_default:
-  - text: "I'm not sure I understood. Try asking about stations by city, nearest station, or station details."
+  utter_goodbye:
+  - text: "Bye! Happy charging! ⚡"
+  - text: "See you later! Drive electric!"
+  
+  utter_help:
+  - text: "I can find EV stations by city, state, charger type, operator, or near your location. Just ask! Try: 'Stations in Pune' or 'Show CCS chargers near me'"
+  - text: "You can ask me things like:\n- Find stations in Mumbai\n- Show Tata Power stations\n- Nearest CCS charger\n- Top rated stations"
+  
+  utter_ask_city:
+  - text: "Which city are you looking for stations in?"
+  - text: "Please tell me the city name."
+  
+  utter_ask_state:
+  - text: "Which state would you like to search in?"
+  - text: "Please tell me the state name (like Maharashtra, Karnataka, etc.)"
+  
+  utter_ask_charger_type:
+  - text: "Which charger type are you looking for? (CCS, Type2, CHAdeMO, AC, or DC)"
+  - text: "What type of charger do you need? CCS, Type2, or CHAdeMO?"
+  
+  utter_ask_operator:
+  - text: "Which operator would you like? (Tata Power, Jio-bp, Ather Grid, etc.)"
+  - text: "Please tell me the station operator name."
+  
+  utter_ask_location_permission:
+  - text: "Please share your location so I can find nearby stations."
+  - text: "To find stations near you, I need your location. Can you share it?"
+  
+  utter_select_from_list:
+  - text: "Say a number (1, 2, 3...) to get full details of that station!"
+  - text: "Which one would you like more details about? Just say the number!"
+  
+  utter_no_stations_found:
+  - text: "Sorry, no stations found for that. Try a different city or filter."
+  - text: "I couldn't find any stations matching your request. Want to try something else?"
+  
+  utter_out_of_scope:
+  - text: "I only know about EV charging stations. Ask me about those!"
+  - text: "Sorry, I'm just an EV station assistant. Ask me about charging stations!"
 
 actions:
-  - action_find_by_city
-  - action_find_nearest
-  - action_get_details
+  - action_search_stations
+  - action_get_station_by_id
+  - action_find_nearby

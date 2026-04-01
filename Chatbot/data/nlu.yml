@@ -11,6 +11,14 @@ nlu:
     - hey there
     - hello there
     - hi there
+    - namaste
+    - what's up
+    - yo
+    - hii
+    - heyy
+    - sup
+    - howdy
+    - greetings
 
 - intent: goodbye
   examples: |
@@ -20,16 +28,17 @@ nlu:
     - good night
     - goodbye for now
     - thanks bye
+    - see ya
+    - later
+    - catch you later
+    - peace out
+    - bye bye
+    - tata
+    - ok thanks bye
+    - alright bye
+    - take care
 
-- intent: thank
-  examples: |
-    - thanks
-    - thank you
-    - thanks a lot
-    - thank you so much
-    - appreciate it
-
-- intent: help
+- intent: ask_help
   examples: |
     - help
     - what can you do
@@ -37,6 +46,33 @@ nlu:
     - what do you do
     - help me
     - show help
+    - what can I ask
+    - how do you work
+    - tell me what you can do
+    - what are your features
+    - what questions can I ask
+    - help please
+    - I need help
+    - can you help me
+    - what should I ask
+
+- intent: out_of_scope
+  examples: |
+    - what is the weather
+    - tell me a joke
+    - who is PM of India
+    - what's the stock market
+    - how old are you
+    - what's your name
+    - who made you
+    - what time is it
+    - play music
+    - set an alarm
+    - what's the news
+    - tell me a story
+    - I'm bored
+    - sing a song
+    - what's trending
 
 - intent: find_station_by_city
   examples: |
@@ -48,14 +84,35 @@ nlu:
     - Find EV stations near [Hyderabad](city)
     - Show charging points in [Kolkata](city)
     - Any stations in [Ahmedabad](city)?
-    - Find chargers in [Lb Nagar](city)
-    - Stations in [Coimbatore](city)
-    - EV charging in [Kerala](city)
-    - Where can I charge in [Odisha](city)?
-    - Show me stations in [Jaipur](city)
-    - Are there EV chargers in [Lucknow](city)?
+    - Find chargers in [Jaipur](city)
+    - Stations in [Lucknow](city)
+    - EV charging in [Nagpur](city)
+    - Where can I charge in [Surat](city)?
+    - [Mumbai](city) mein charging station kahan hai
+    - Pune mein EV charger dikhao
+    - Bangalore me charging point batao
+    - Delhi me koi station hai kya
+    - Chennai me nearest charger
 
-- intent: find_nearest_station
+- intent: find_station_by_state
+  examples: |
+    - Show stations in [Maharashtra](state)
+    - EV chargers in [Karnataka](state)
+    - Find charging points in [Gujarat](state)
+    - Stations in [Tamil Nadu](state)
+    - [Kerala](state) mein charging stations
+    - [Rajasthan](state) me EV chargers
+    - Show me stations in [Uttar Pradesh](state)
+    - Charging stations in [West Bengal](state)
+    - [Telangana](state) me charging point
+    - Find EV stations in [Madhya Pradesh](state)
+    - [Punjab](state) mein charger
+    - Stations in [Haryana](state)
+    - [Odisha](state) me koi station hai
+    - [Bihar](state) mein charging point
+    - Maharashtra me EV charger dikhao
+
+- intent: find_nearby_stations
   examples: |
     - What's the nearest station?
     - Find nearest EV charger
@@ -67,29 +124,388 @@ nlu:
     - I need a charger nearby
     - Show me the closest station
     - Where is the closest charger?
+    - Nearest station please
+    - Show nearby chargers
+    - Koi station pass mein hai
+    - Mere paas EV charger batao
+    - Nearest charger dikhao
 
-- intent: get_station_details
+- intent: find_station_by_operator
   examples: |
-    - Tell me about [Nikol EV](station_name)
-    - Show details for [Tata Power](station_name)
-    - What chargers at [Ather Grid](station_name)?
-    - More info on [Blaze Fast Charger](station_name)
-    - Details of [Jio-bp pulse](station_name)
-    - Tell me about the [BPCL Charging Station](station_name)
-    - Information for [Hindustan Petroleum](station_name)
-    - What's available at [Electric Vehicle Charging Station](station_name)?
-    - Show me [WARIVO](station_name) details
-    - Tell me more about [Adani Charging Station](station_name)
-    - Give me details of [Zeon Charging](station_name)
+    - Show [Tata Power](operator) stations
+    - Find [Jio-bp](operator) EV chargers
+    - [Ather Grid](operator) charging points
+    - Show me [BPCL](operator) stations
+    - [Zeon Charging](operator) stations
+    - [Chargezone](operator) chargers near me
+    - [Statiq](operator) stations
+    - [EESL](operator) charging points
+    - [Adani](operator) EV stations
+    - [Bolt.Earth](operator) chargers
+    - Tata Power ke stations
+    - Jio-bp charging points dikhao
+    - Ather Grid station kahan hai
+    - BPCL ka charger batao
 
-- intent: inform_location
+- intent: find_station_by_charger_type
   examples: |
-    - I'm in [Pune](city)
-    - I am in [Mumbai](location)
-    - My location is [Delhi](city)
-    - I'm at [Bangalore](location)
-    - [Chennai](city)
-    - Currently in [Hyderabad](location)
-    - I am near [Kolkata](city)
-    - [Ahmedabad](location)
-    - I'm located in [Jaipur](city)
+    - Show [CCS](charger_type) chargers
+    - Find [Type2](charger_type) charging stations
+    - Where can I find [CHAdeMO](charger_type) chargers?
+    - Show me [DC](charger_type) fast chargers
+    - [AC](charger_type) charging points
+    - [CCS2](charger_type) stations near me
+    - Need a [CCS](charger_type) charger
+    - [Type2](charger_type) plug kahan hai
+    - CCS charger dikhao
+    - Type2 charging point batao
+    - CHAdeMO station near me
+    - DC fast charger chahiye
+    - AC charger kahan milega
+
+- intent: find_top_rated_stations
+  examples: |
+    - Show top rated stations
+    - Best EV charging stations
+    - Highest rated chargers
+    - Popular EV stations
+    - Good rating stations
+    - Top EV charging points
+    - Best rated stations near me
+    - Show me 5 star stations
+    - Popular charging points
+    - Sabse acchi station
+    - Best EV charger batao
+    - Top rated charger dikhao
+    - High rating wali station
+
+- intent: find_fastest_charger
+  examples: |
+    - Show fastest chargers
+    - High power charging stations
+    - 150kW charging stations
+    - 200kW fast charger
+    - Ultra fast chargers
+    - Quick charging points
+    - Fastest EV charger near me
+    - High speed charger
+    - Rapid charging station
+    - Fast charger dikhao
+    - Tez charging wala station
+    - High power charger batao
+    - 100kW plus charger
+
+- intent: find_verified_stations
+  examples: |
+    - Show only verified stations
+    - Trusted EV chargers
+    - Certified charging points
+    - Verified stations only
+    - Authentic EV stations
+    - Reliable chargers
+    - Verified charging points
+    - Trusted station near me
+    - Verified charger dikhao
+    - Authentic station batao
+    - Certified EV charger
+    - Only verified stations
+    - Trusted charging points
+
+- intent: ask_charger_info
+  examples: |
+    - What chargers does it have?
+    - What plug type?
+    - Which connector?
+    - Tell me about the chargers
+    - Charger details please
+    - What charging speed?
+    - Which charging type?
+    - Charger specs
+    - Kitne kW ka charger hai
+    - Charger type kya hai
+    - What's the power rating?
+    - AC or DC charger?
+
+- intent: ask_port_availability
+  examples: |
+    - How many ports free?
+    - Is it available now?
+    - Are ports available?
+    - Show available ports
+    - Free charging ports?
+    - Kitne ports free hai
+    - Available charger batao
+    - Is charger free?
+    - Empty ports?
+    - Ports available status
+    - Koi free port hai kya
+    - Availability check
+
+- intent: ask_amenities
+  examples: |
+    - What facilities are there?
+    - Is there parking?
+    - Do they have WiFi?
+    - Restroom available?
+    - What amenities?
+    - Are there shops nearby?
+    - Food available?
+    - Security available?
+    - Facilities kya hai
+    - Parking hai kya
+    - WiFi hai ya nahi
+    - Washroom available?
+
+- intent: ask_rating
+  examples: |
+    - What's the rating?
+    - How many reviews?
+    - Is it a good station?
+    - Show me the rating
+    - Rating kya hai
+    - Kitna rating hai
+    - Reviews batao
+    - Customer feedback
+    - What do others say?
+    - Is this station good?
+
+- intent: ask_operator
+  examples: |
+    - Who runs this station?
+    - Which company?
+    - Who manages this?
+    - Operator name?
+    - Kon chala raha hai
+    - Owner kya hai
+    - Which operator?
+    - Company name?
+    - Service provider?
+    - Who owns it?
+
+- intent: ask_verified
+  examples: |
+    - Is it verified?
+    - Is this trusted?
+    - Is it certified?
+    - Verified status?
+    - Kya ye verified hai
+    - Trusted station?
+    - Certification status?
+    - Authentic station?
+    - Verified or not?
+    - Check verification
+
+- intent: ask_status
+  examples: |
+    - Is it open?
+    - Is it operational?
+    - Is the station active?
+    - Status kya hai
+    - Currently working?
+    - Is this active?
+    - Open now?
+    - Working or not?
+    - Availability status?
+    - Station open hai?
+
+- intent: select_station_from_list
+  examples: |
+    - first one
+    - second
+    - option 3
+    - the last one
+    - 1
+    - 2
+    - 3
+    - number 4
+    - choose first
+    - pick second
+    - show me the 1st
+    - give me the third
+    - last option
+    - first wala
+    - doosra
+    - teesra
+
+- intent: ask_charger_info
+  examples: |
+    - What chargers does it have?
+    - What plug type?
+    - Which connector?
+    - Tell me about the chargers
+    - Charger details please
+    - What charging speed?
+    - Which charging type?
+    - Charger specs
+    - Kitne kW ka charger hai
+    - Charger type kya hai
+    - What's the power rating?
+    - AC or DC charger?
+    - Is it fast charging?
+    - Charger speed batao
+
+- intent: ask_port_availability
+  examples: |
+    - How many ports free?
+    - Is it available now?
+    - Are ports available?
+    - Show available ports
+    - Free charging ports?
+    - Kitne ports free hai
+    - Available charger batao
+    - Is charger free?
+    - Empty ports?
+    - Ports available status
+    - Koi free port hai kya
+    - Availability check
+    - How many slots free?
+
+- intent: ask_amenities
+  examples: |
+    - What facilities are there?
+    - Is there parking?
+    - Do they have WiFi?
+    - Restroom available?
+    - What amenities?
+    - Are there shops nearby?
+    - Food available?
+    - Security available?
+    - Facilities kya hai
+    - Parking hai kya
+    - WiFi hai ya nahi
+    - Washroom available?
+    - Cafeteria available?
+    - 24/7 open hai?
+
+- intent: ask_rating
+  examples: |
+    - What's the rating?
+    - How many reviews?
+    - Is it a good station?
+    - Show me the rating
+    - Rating kya hai
+    - Kitna rating hai
+    - Reviews batao
+    - Customer feedback
+    - What do others say?
+    - Is this station good?
+    - 5 star hai kya
+    - User reviews?
+    - Average rating?
+
+- intent: ask_operator
+  examples: |
+    - Who runs this station?
+    - Which company?
+    - Who manages this?
+    - Operator name?
+    - Kon chala raha hai
+    - Owner kya hai
+    - Which operator?
+    - Company name?
+    - Service provider?
+    - Who owns it?
+    - Is it Tata Power?
+    - Is this Jio-bp?
+
+- intent: ask_verified
+  examples: |
+    - Is it verified?
+    - Is this trusted?
+    - Is it certified?
+    - Verified status?
+    - Kya ye verified hai
+    - Trusted station?
+    - Certification status?
+    - Authentic station?
+    - Verified or not?
+    - Check verification
+    - Is it genuine?
+    - Official station?
+
+- intent: ask_status
+  examples: |
+    - Is it open?
+    - Is it operational?
+    - Is the station active?
+    - Status kya hai
+    - Currently working?
+    - Is this active?
+    - Open now?
+    - Working or not?
+    - Availability status?
+    - Station open hai?
+    - Chalu hai kya
+    - Is it functional?
+
+- intent: select_station_from_list
+  examples: |
+    - first one
+    - second
+    - option 3
+    - the last one
+    - 1
+    - 2
+    - 3
+    - number 4
+    - choose first
+    - pick second
+    - show me the 1st
+    - give me the third
+    - last option
+    - first wala
+    - doosra
+    - teesra
+    - chautha
+    - select option 1
+    - the first station
+
+# Synonyms for charger types
+- synonym: CCS
+  examples: |
+    - css
+    - CCS1
+    - ccs charger
+    - CCS fast charger
+    - ccs1
+    - CCS Type 1
+
+- synonym: CCS2
+  examples: |
+    - css2
+    - CCS type 2
+    - ccs2 charger
+    - CCS combo 2
+
+- synonym: CHAdeMO
+  examples: |
+    - chademo
+    - Chademo
+    - CHADEMO
+    - chademo charger
+    - chademo plug
+
+- synonym: Type2
+  examples: |
+    - type 2
+    - type-2
+    - T2
+    - AC Type2
+    - type2
+    - Type 2 charger
+    - type 2 plug
+
+- synonym: AC
+  examples: |
+    - ac
+    - AC charger
+    - ac slow charger
+    - alternating current
+
+- synonym: DC
+  examples: |
+    - dc
+    - DC fast charger
+    - dc quick charger
+    - direct current
+    - DC rapid charger
