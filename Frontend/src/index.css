@@ -17,6 +17,10 @@
   }
 }
 
+.mapboxgl-ctrl-attrib-inner {
+  display: none;
+}
+
 .Toastify__toast--success {
   background: linear-gradient(to bottom right, #34d399, #14b8a6) !important;
   color: white !important;

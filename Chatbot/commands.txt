@@ -1,5 +1,9 @@
+to start .venv:
+    source .venv/Scripts/activate
+
 terminal 1:
     rasa run actions
 
 terminal 2:
     rasa run --enable-api --cors "*" 
+
