@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Hero() {
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Small delay so browser paints first, then animates in
@@ -170,6 +171,11 @@ function Hero() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && search.trim()) {
+                  navigate(`/stations?q=${encodeURIComponent(search.trim())}`);
+                }
+              }}
               placeholder="Search by city, area, or station name..."
               className="flex-1 bg-transparent outline-none px-3 py-2.5
                          text-gray-800 placeholder-gray-400 text-sm w-full" />
@@ -201,8 +207,9 @@ function Hero() {
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-3"
           }`}>
-          {["Mumbai", "Delhi", "Bangalore", "Pune", "Chennai"].map((city, i) => (
+          {["Mumbai", "Delhi", "Bengaluru", "Pune", "Chennai"].map((city, i) => (
             <button key={city}
+              onClick={() => navigate(`/stations?q=${encodeURIComponent(city)}`)}
               className="px-3 py-1.5 rounded-full
                          bg-white/5 border border-white/10
                          text-gray-400 text-xs font-medium

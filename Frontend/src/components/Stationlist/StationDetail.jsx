@@ -21,26 +21,26 @@ const facilityIconMap = {
 };
 
 const chargerTypeColors = {
-  CCS:     { bg: "bg-blue-50",   border: "border-blue-200",   text: "text-blue-700" },
-  CCS2:    { bg: "bg-blue-50",   border: "border-blue-200",   text: "text-blue-700" },
+  CCS: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700" },
+  CCS2: { bg: "bg-blue-50", border: "border-blue-200", text: "text-blue-700" },
   CHAdeMO: { bg: "bg-orange-50", border: "border-orange-200", text: "text-orange-700" },
-  Type2:   { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700" },
-  AC:      { bg: "bg-teal-50",   border: "border-teal-200",   text: "text-teal-700" },
-  DC:      { bg: "bg-emerald-50",border: "border-emerald-200",text: "text-emerald-700" },
+  Type2: { bg: "bg-purple-50", border: "border-purple-200", text: "text-purple-700" },
+  AC: { bg: "bg-teal-50", border: "border-teal-200", text: "text-teal-700" },
+  DC: { bg: "bg-emerald-50", border: "border-emerald-200", text: "text-emerald-700" },
 };
 
 function StationDetail() {
   const navigate = useNavigate();
-  const { id }   = useParams();
+  const { id } = useParams();
 
-  const [station,        setStation]        = useState(null);
-  const [loading,        setLoading]        = useState(true);
-  const [activeTab,      setActiveTab]      = useState("ports");
-  const [imgError,       setImgError]       = useState(false);
-  const [visible,        setVisible]        = useState(false);
-  const [reviews,        setReviews]        = useState([]);
+  const [station, setStation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("ports");
+  const [imgError, setImgError] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [reviews, setReviews] = useState([]);
   const [reviewsLoading, setReviewsLoading] = useState(true);
-  const [navMode,        setNavMode]        = useState(false);   // ← NEW
+  const [navMode, setNavMode] = useState(false);   // ← NEW
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -51,7 +51,7 @@ function StationDetail() {
       setLoading(true);
       try {
         const response = await fetch(`http://localhost:8000/api/stations/${id}`);
-        const result   = await response.json();
+        const result = await response.json();
         setStation(result.station || null);
       } catch (err) {
         console.error(err);
@@ -63,7 +63,7 @@ function StationDetail() {
 
     const fetchReviews = async () => {
       try {
-        const res  = await fetch(`http://localhost:8000/api/stations/${id}/reviews`);
+        const res = await fetch(`http://localhost:8000/api/stations/${id}/reviews`);
         const data = await res.json();
         setReviews(data.reviews || []);
       } catch (err) {
@@ -117,11 +117,11 @@ function StationDetail() {
     );
   }
 
-  const chargers    = station.chargers || [];
-  const totalPorts  = chargers.reduce((sum, c) => sum + (c.totalPorts || 1), 0);
-  const coverImage  = !imgError && station.mediaItems?.[0]?.itemURL;
-  const chargerTypes= [...new Set(chargers.map(c => c.type).filter(Boolean))];
-  const maxPower    = chargers.length ? Math.max(...chargers.map(c => c.power || 0)) : null;
+  const chargers = station.chargers || [];
+  const totalPorts = chargers.reduce((sum, c) => sum + (c.totalPorts || 1), 0);
+  const coverImage = !imgError && station.mediaItems?.[0]?.itemURL;
+  const chargerTypes = [...new Set(chargers.map(c => c.type).filter(Boolean))];
+  const maxPower = chargers.length ? Math.max(...chargers.map(c => c.power || 0)) : null;
 
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4 md:px-8">
@@ -162,30 +162,22 @@ function StationDetail() {
 
                 {/* Status + rating */}
                 <div className="flex items-center justify-between mb-4">
+
+                  {/* Operational */}
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 text-xs font-bold group-hover:bg-emerald-100 transition-colors duration-200">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     Operational
                   </div>
-                  {station.averageRating ? (
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-50 border border-amber-100 hover:bg-amber-100 hover:scale-105 transition-all duration-200 cursor-default">
-                      <FontAwesomeIcon icon={faStar} className="text-amber-400 text-xs" />
-                      <span className="text-amber-600 text-xs font-bold">{station.averageRating.toFixed(1)}</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gray-50 border border-gray-100">
-                      <FontAwesomeIcon icon={faStar} className="text-gray-300 text-xs" />
-                      <span className="text-gray-400 text-xs font-medium">No rating</span>
+
+                  {/* Max power badge */}
+                  {maxPower > 0 && (
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold hover:bg-amber-100 transition-colors duration-200">
+                      <FontAwesomeIcon icon={faBolt} className="text-[10px] leading-none" />
+                      Up to {maxPower} kW
                     </div>
                   )}
-                </div>
 
-                {/* Max power badge */}
-                {maxPower > 0 && (
-                  <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold mb-3 hover:bg-amber-100 transition-colors duration-200">
-                    <FontAwesomeIcon icon={faBolt} className="text-[9px]" />
-                    Up to {maxPower} kW
-                  </div>
-                )}
+                </div>
 
                 {/* Name */}
                 <h1 className="text-xl font-extrabold text-gray-900 leading-snug mb-1 group-hover:text-emerald-700 transition-colors duration-300">
@@ -214,9 +206,9 @@ function StationDetail() {
                 {/* Stats grid */}
                 <div className="grid grid-cols-3 gap-2.5 mb-5">
                   {[
-                    { icon: faPlug,  value: chargerTypes.length || chargers.length, label: "Types",  iconColor: "text-emerald-500", bg: "bg-emerald-50 border-emerald-100" },
-                    { icon: faBolt,  value: totalPorts,                             label: "Ports",  iconColor: "text-teal-500",    bg: "bg-teal-50 border-teal-100" },
-                    { icon: faStar,  value: station.averageRating ? `${station.averageRating.toFixed(1)}★` : "N/A", label: "Rating", iconColor: "text-amber-400", bg: "bg-amber-50 border-amber-100" },
+                    { icon: faPlug, value: chargerTypes.length || chargers.length, label: "Types", iconColor: "text-emerald-500", bg: "bg-emerald-50 border-emerald-100" },
+                    { icon: faBolt, value: totalPorts, label: "Ports", iconColor: "text-teal-500", bg: "bg-teal-50 border-teal-100" },
+                    { icon: faStar, value: station.averageRating ? `${station.averageRating.toFixed(1)}` : "N/A", label: "Rating", iconColor: "text-amber-400", bg: "bg-amber-50 border-amber-100" },
                   ].map(stat => (
                     <div key={stat.label}
                       className={`flex flex-col items-center justify-center p-3 rounded-xl border ${stat.bg} hover:scale-105 hover:shadow-sm transition-all duration-200 cursor-default`}>
@@ -316,8 +308,8 @@ function StationDetail() {
 
               <div className="flex border-b border-gray-100 bg-gray-50/50">
                 {[
-                  { key: "ports",   label: "Charging Ports", count: chargers.length },
-                  { key: "reviews", label: "Reviews",        count: reviews.length },
+                  { key: "ports", label: "Charging Ports", count: chargers.length },
+                  { key: "reviews", label: "Reviews", count: reviews.length },
                 ].map(tab => (
                   <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                     className={`flex-1 flex items-center justify-center gap-2 py-4 text-sm font-semibold relative transition-all duration-200

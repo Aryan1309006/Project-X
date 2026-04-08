@@ -1,53 +1,18 @@
 const EVStation = require("../models/evStation.model");
 const ExpressError = require("../utils/ExpressError");
 
-// ── GET NEARBY STATIONS ──
-module.exports.getNearbyStations = async (req, res) => {
-  const { lat, lng, radius = 5000, page = 1 } = req.query;
-
-  if (!lat || !lng) {
-    throw new ExpressError(400, "Latitude and longitude are required");
-  }
-
-  const limit = 20;
-  const skip = (page - 1) * limit;
-
-  const geoFilter = {
-    // ✅ removed status: "approved" — data not seeded with status yet
-    location: {
-      $near: {
-        $geometry: { type: "Point", coordinates: [parseFloat(lng), parseFloat(lat)] },
-        $maxDistance: parseInt(radius),
-      },
-    },
-  };
-
-  const stations = await EVStation.find(geoFilter)
-    .select("-updatedBy -__v")
-    .skip(skip)
-    .limit(limit);
-
-  const total = stations.length;
-
-  res.status(200).json({ success: true, page: Number(page), results: stations.length, total, stations });
-};
-
 // ── GET STATION BY ID ──
 module.exports.getStationById = async (req, res) => {
   const station = await EVStation.findById(req.params.id)
     .populate("createdBy", "name email")
     .select("-__v");
-
   if (!station) throw new ExpressError(404, "Station not found");
-
   res.status(200).json({ success: true, station });
 };
 
 // ── GET ALL STATIONS FOR MAP ──
 module.exports.getAllStationsForMap = async (req, res) => {
   const { lat, lng, radius = 200000 } = req.query;
-
-  // If GPS coords provided → return only nearby stations within radius
   const filter = lat && lng
     ? {
         location: {
@@ -57,47 +22,102 @@ module.exports.getAllStationsForMap = async (req, res) => {
           },
         },
       }
-    : {}; // No GPS → return all (fallback)
-
+    : {};
   const stations = await EVStation.find(filter)
-    .select("name location address averageRating isVerified chargers operator")
-    // .limit(200); // cap at 200 even in fallback
-
+    .select("name location address averageRating isVerified chargers operator");
   res.status(200).json({ success: true, total: stations.length, stations });
 };
 
-// ── GET ALL STATIONS WITH SEARCH + PAGINATION ──
+// ── GET ALL STATIONS WITH SEARCH + FILTERS + OPTIONAL GPS ──
 module.exports.getAllStations = async (req, res) => {
-  const { page = 1, search = "", city = "", chargerType = "" } = req.query;
+  const {
+    search      = "",
+    chargerType = "",
+    minPower    = "",
+    available   = "",
+    verified    = "",
+    minRating   = "",
+    city        = "",
+    state       = "",
+    sortBy      = "rating",
+    lat         = "",
+    lng         = "",
+    radius      = "200000",
+  } = req.query;
 
-  const limit = 20;
-  const skip = (page - 1) * limit;
-  const filter = {}; // ✅ already correct — no status filter
+  let filter = {};
 
+  // ── Step 1: GPS base filter (applied first if coords present) ─────
+  if (lat && lng) {
+    filter.location = {
+      $near: {
+        $geometry: {
+          type: "Point",
+          coordinates: [parseFloat(lng), parseFloat(lat)],
+        },
+        $maxDistance: parseInt(radius),
+      },
+    };
+  }
+
+  // ── Step 2: Text search ───────────────────────────────────────────
   if (search.trim()) {
     filter.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { operator: { $regex: search, $options: "i" } },
-      { "address.city": { $regex: search, $options: "i" } },
-      { "address.state": { $regex: search, $options: "i" } },
+      { name:            { $regex: search.trim(), $options: "i" } },
+      { operator:        { $regex: search.trim(), $options: "i" } },
+      { "address.city":  { $regex: search.trim(), $options: "i" } },
+      { "address.state": { $regex: search.trim(), $options: "i" } },
     ];
   }
 
-  if (city.trim())        filter["address.city"]    = { $regex: city, $options: "i" };
-  if (chargerType.trim()) filter["chargers.type"]   = { $regex: chargerType, $options: "i" };
+  // ── Step 3: Charger filters — $elemMatch enforces same element ────
+  if (chargerType.trim() || minPower || available === "true") {
+    const chargerMatch = {};
+    if (chargerType.trim()) {
+      chargerMatch.type = { $regex: `^${chargerType.trim()}$`, $options: "i" };
+    }
+    if (minPower && !isNaN(parseFloat(minPower))) {
+      chargerMatch.power = { $gte: parseFloat(minPower) };
+    }
+    if (available === "true") {
+      chargerMatch.availablePorts = { $gt: 0 };
+    }
+    filter.chargers = { $elemMatch: chargerMatch };
+  }
 
-  const [stations, total] = await Promise.all([
-    EVStation.find(filter)
-      .select("name operator address location averageRating isVerified chargers status image")
-      .skip(skip)
-      .limit(limit)
-      .sort({ averageRating: -1 }),
-    EVStation.countDocuments(filter),
-  ]);
+  // ── Step 4: Verified boolean — strictly true ──────────────────────
+  if (verified === "true") {
+    filter.isVerified = true;
+  }
 
-  res.status(200).json({ success: true, page: Number(page), totalPages: Math.ceil(total / limit), results: stations.length, total, stations });
+  // ── Step 5: Min rating — strict numeric $gte ──────────────────────
+  if (minRating && !isNaN(parseFloat(minRating))) {
+    filter.averageRating = { $gte: parseFloat(minRating) };
+  }
+
+  // ── Step 6: City — exact match, case-insensitive ──────────────────
+  if (city.trim()) {
+    filter["address.city"] = { $regex: `^${city.trim()}$`, $options: "i" };
+  }
+
+  // ── Step 7: State — exact match, case-insensitive ─────────────────
+  if (state.trim()) {
+    filter["address.state"] = { $regex: `^${state.trim()}$`, $options: "i" };
+  }
+
+  // ── Step 8: Sort ($near already sorts by distance, override only if no GPS) ──
+  const sortOption = lat && lng
+    ? {}   // $near auto-sorts by proximity — don't override
+    : sortBy === "newest"
+      ? { createdAt: -1 }
+      : { averageRating: -1 };
+
+  const stations = await EVStation.find(filter)
+    .select("name operator address location averageRating isVerified chargers status image")
+    .sort(sortOption);
+
+  res.status(200).json({ success: true, total: stations.length, stations });
 };
-
 
 // ── CREATE STATION ──
 module.exports.createStation = async (req, res) => {
@@ -105,8 +125,8 @@ module.exports.createStation = async (req, res) => {
     name, description, operator,
     city, state, country,
     lat, lng,
-    chargers,   // array
-    amenities,  // array
+    chargers,
+    amenities,
   } = req.body;
 
   if (!name || !lat || !lng) {
@@ -122,10 +142,10 @@ module.exports.createStation = async (req, res) => {
       type: "Point",
       coordinates: [parseFloat(lng), parseFloat(lat)],
     },
-    chargers:   chargers   || [],
-    amenities:  amenities  || [],
-    status:     "pending",       // ← always pending until admin approves
-    createdBy:  req.user.id,     // ← from JWT via protect middleware
+    chargers: chargers || [],
+    amenities: amenities || [],
+    status: "pending",
+    createdBy: req.user.id,
   });
 
   res.status(201).json({

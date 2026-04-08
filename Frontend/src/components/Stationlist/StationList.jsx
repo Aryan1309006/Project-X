@@ -1,78 +1,85 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import StationCard from "./StationCard";
-import { useSearchParams } from "react-router-dom";
 
 function StationList() {
   const navigate = useNavigate();
 
-
-  const [stations, setStations] = useState([]);
   const [filteredStations, setFilteredStations] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalStations, setTotalStations] = useState(0);
-  const [pageTransition, setPageTransition] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [userLoc, setUserLoc] = useState(null);
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
-
-  const limit = 20;
+  const debounceRef = useRef(null);
+  const [chargerType, setChargerType] = useState("");
+  const [minPower, setMinPower] = useState("");
+  const [available, setAvailable] = useState(false);
+  const [verified, setVerified] = useState(false);
+  const [minRating, setMinRating] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [sortBy, setSortBy] = useState("rating");
 
   useEffect(() => {
-  if (query) {
-    setSearch(query);
-  }
-}, [query]);
+    if (query) {
+      setSearch(query);
+    }
+  }, [query]);
+
+  // ── Get GPS once on mount ─────────────────────────────────────────
+  useEffect(() => {
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => setUserLoc({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setUserLoc(null)
+    );
+  }, []);
 
   useEffect(() => {
-    const fetchStations = async () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(async () => {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
+
+        // ── Build params — filters always sent regardless of mode ─────
+        const params = new URLSearchParams();
+        if (search.trim()) params.set("search", search.trim());
+        if (chargerType.trim()) params.set("chargerType", chargerType.trim());
+        if (minPower) params.set("minPower", minPower);
+        if (available) params.set("available", "true");
+        if (verified) params.set("verified", "true");
+        if (minRating) params.set("minRating", minRating);
+        if (city.trim()) params.set("city", city.trim());
+        if (state.trim()) params.set("state", state.trim());
+        params.set("sortBy", sortBy);
+
+        // ── GPS coords injected into same endpoint ────────────────────
+        if (userLoc && !search.trim()) {
+          params.set("lat", userLoc.lat);
+          params.set("lng", userLoc.lng);
+          params.set("radius", "200000");
+        }
+
         const response = await fetch(
-          `http://localhost:8000/api/stations?page=${page}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
+          `http://localhost:8000/api/stations?${params}`,
+          { headers: { Authorization: `Bearer ${token}` } }
         );
         const data = await response.json();
         if (data && data.stations) {
-          setStations(data.stations);
           setFilteredStations(data.stations);
-          setTotalStations(data.total);
         }
       } catch (error) {
         console.error("Error fetching stations:", error);
       } finally {
         setLoading(false);
-        setTimeout(() => setPageTransition(false), 100);
       }
-    };
-    fetchStations();
-  }, [page]);
+    }, search.trim() ? 400 : 0);
 
-  useEffect(() => {
-    if (!search) {
-      setFilteredStations(stations);
-      return;
-    }
-    const result = stations.filter((station) =>
-      station.name?.toLowerCase().includes(search.toLowerCase()),
-    );
-    setFilteredStations(result);
-  }, [search, stations]);
-
-  const totalPages = Math.ceil(totalStations / limit);
-
-  const handlePageChange = (newPage) => {
-    setPageTransition(true);
-    setTimeout(() => setPage(newPage), 200);
-  };
-
+    return () => clearTimeout(debounceRef.current);
+  }, [search, userLoc, chargerType, minPower, available, verified, minRating, city, state, sortBy]);
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
@@ -192,6 +199,173 @@ function StationList() {
           </div>
         </div>
 
+        {/* ── Filter Bar ───────────────────────────────────────────── */}
+        <div className="flex items-center gap-2 my-2 overflow-x-auto pb-1 scrollbar-hide sm:flex-wrap sm:overflow-visible">
+
+          {/* Charger Type */}
+          <div className="relative">
+            <select
+              value={chargerType}
+              onChange={(e) => setChargerType(e.target.value)}
+              className={`text-xs pl-8 pr-6 h-9 rounded-full border font-semibold cursor-pointer appearance-none
+        transition-all duration-200 outline-none shadow-sm
+        ${chargerType
+                  ? "bg-gradient-to-t from-emerald-400 to-teal-600 text-white border-transparent shadow-emerald-200 shadow-md"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-emerald-400 hover:shadow-md"
+                }`}
+            >
+              <option value="">Charger Type</option>
+              <option value="CCS">CCS</option>
+              <option value="CHAdeMO">CHAdeMO</option>
+              <option value="Type 2">Type 2</option>
+              <option value="AC">AC</option>
+              <option value="DC">DC</option>
+            </select>
+            <i className={`fa-solid fa-bolt absolute left-2.5 top-1/2 -translate-y-1/2 text-[10px] z-10 pointer-events-none
+      ${chargerType
+                ? "text-white"
+                : "bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent"
+              }`} />
+            <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]
+      ${chargerType ? "text-white" : "text-gray-400"}`}>▾</span>
+          </div>
+
+          {/* Min Power */}
+          <div className="relative">
+            <select
+              value={minPower}
+              onChange={(e) => setMinPower(e.target.value)}
+              className={`text-xs pl-7 pr-6 py-2 rounded-full border font-semibold cursor-pointer appearance-none
+        transition-all duration-200 outline-none shadow-sm
+        ${minPower
+                  ? "bg-gradient-to-t from-emerald-400 to-teal-600 text-white border-transparent shadow-emerald-200 shadow-md"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-emerald-400 hover:shadow-md"
+                }`}
+            >
+              <option value="">Any Power</option>
+              <option value="7.4">7.4 kW+</option>
+              <option value="22">22 kW+</option>
+              <option value="50">50 kW+ (Fast)</option>
+              <option value="100">100 kW+ (Ultra Fast)</option>
+            </select>
+            <i className={`fa-solid fa-plug absolute left-2.5 top-1/2 -translate-y-1/2 text-[9px] pointer-events-none
+      ${minPower
+                ? "text-white"
+                : "bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent"
+              }`} />
+            <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]
+      ${minPower ? "text-white" : "text-gray-400"}`}>▾</span>
+          </div>
+
+          {/* Min Rating */}
+          <div className="relative">
+            <select
+              value={minRating}
+              onChange={(e) => setMinRating(e.target.value)}
+              className={`text-xs pl-7 pr-6 py-2 rounded-full border font-semibold cursor-pointer appearance-none
+        transition-all duration-200 outline-none shadow-sm
+        ${minRating
+                  ? "bg-gradient-to-t from-emerald-400 to-teal-600 text-white border-transparent shadow-emerald-200 shadow-md"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-emerald-400 hover:shadow-md"
+                }`}
+            >
+              <option value="">Any Rating</option>
+              <option value="3">3⭐ & above</option>
+              <option value="4">4⭐ & above</option>
+              <option value="4.5">4.5⭐ & above</option>
+            </select>
+            <i className={`fa-solid fa-star absolute left-2.5 top-1/2 -translate-y-1/2 text-[9px] pointer-events-none
+      ${minRating
+                ? "text-white"
+                : "bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent"
+              }`} />
+            <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]
+      ${minRating ? "text-white" : "text-gray-400"}`}>▾</span>
+          </div>
+
+          {/* Sort By */}
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className={`text-xs pl-7 pr-6 py-2 rounded-full border font-semibold cursor-pointer appearance-none
+        transition-all duration-200 outline-none shadow-sm
+        ${sortBy !== "rating"
+                  ? "bg-gradient-to-t from-emerald-400 to-teal-600 text-white border-transparent shadow-emerald-200 shadow-md"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-emerald-400 hover:shadow-md"
+                }`}
+            >
+              <option value="rating">Top Rated</option>
+              <option value="newest">Newest First</option>
+            </select>
+            <i className={`fa-solid fa-arrow-up-wide-short absolute left-2.5 top-1/2 -translate-y-1/2 text-[9px] pointer-events-none
+      ${sortBy !== "rating"
+                ? "text-white"
+                : "bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent"
+              }`} />
+            <span className={`pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px]
+      ${sortBy !== "rating" ? "text-white" : "text-gray-400"}`}>▾</span>
+          </div>
+
+          {/* Available Now */}
+          <button
+            onClick={() => setAvailable((p) => !p)}
+            className={`text-xs px-3.5 py-2 rounded-full border font-semibold
+      transition-all duration-200 flex items-center gap-1.5 shadow-sm
+      ${available
+                ? "bg-gradient-to-t from-emerald-400 to-teal-600 text-white border-transparent shadow-emerald-200 shadow-md scale-[1.04]"
+                : "bg-white text-gray-500 border-gray-200 hover:border-emerald-400 hover:shadow-md"
+              }`}
+          >
+            <i className={`fa-solid fa-circle-check text-[10px]
+      ${available
+                ? "text-white animate-pulse"
+                : "bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent"
+              }`} />
+            Available Now
+          </button>
+
+          {/* Verified Only */}
+          <button
+            onClick={() => setVerified((p) => !p)}
+            className={`text-xs px-3.5 py-2 rounded-full border font-semibold
+      transition-all duration-200 flex items-center gap-1.5 shadow-sm
+      ${verified
+                ? "bg-gradient-to-t from-emerald-400 to-teal-600 text-white border-transparent shadow-emerald-200 shadow-md scale-[1.04]"
+                : "bg-white text-gray-500 border-gray-200 hover:border-emerald-400 hover:shadow-md"
+              }`}
+          >
+            <i className={`fa-solid fa-shield-halved text-[11px]
+      ${verified
+                ? "text-white"
+                : "bg-gradient-to-t from-emerald-400 to-teal-600 bg-clip-text text-transparent"
+              }`} />
+            Verified Only
+          </button>
+
+          {/* Reset — only visible when any filter is active */}
+          {(chargerType || minPower || minRating || available || verified || sortBy !== "rating") && (
+            <button
+              onClick={() => {
+                setChargerType("");
+                setMinPower("");
+                setMinRating("");
+                setAvailable(false);
+                setVerified(false);
+                setSortBy("rating");
+              }}
+              className="text-xs px-3.5 py-2 rounded-full border border-rose-300 text-rose-400
+        bg-white hover:bg-rose-50 hover:text-rose-500 font-semibold
+        transition-all duration-200 flex items-center gap-1.5 shadow-sm"
+            >
+              <i className="fa-solid fa-xmark text-[11px]" />
+              Reset
+            </button>
+          )}
+
+        </div>
+
+
         {/* Count */}
         <div
           className="flex items-center justify-between mb-6
@@ -202,22 +376,14 @@ function StationList() {
             <span className="text-emerald-600 font-semibold">
               {filteredStations.length}
             </span>{" "}
-            of{" "}
-            <span className="text-gray-700 font-semibold">{totalStations}</span>{" "}
             stations
-          </p>
-          <p className="text-gray-400 text-xs">
-            Page <span className="text-gray-600 font-semibold">{page}</span> of{" "}
-            <span className="text-gray-600 font-semibold">{totalPages}</span>
           </p>
         </div>
 
         {/* Station Cards */}
         <div
           className={`space-y-4 transition-all duration-300
-                         ${pageTransition
-              ? "opacity-0 translate-y-2"
-              : "opacity-100 translate-y-0"
+                     "opacity-100 translate-y-0"
             }`}
         >
           {filteredStations.length > 0 ? (
@@ -275,100 +441,6 @@ function StationList() {
             </div>
           )}
         </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div
-            className="flex justify-center items-center gap-3 mt-10
-                          animate-[fadeInUp_0.6s_ease_forwards]"
-          >
-            <button
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-              className="group flex items-center gap-2 px-4 py-2 rounded-lg
-                         bg-white border border-gray-200 text-gray-600 text-sm font-medium
-                         shadow-sm hover:border-emerald-400 hover:text-emerald-600
-                         hover:shadow-md hover:-translate-x-0.5
-                         disabled:opacity-40 disabled:cursor-not-allowed
-                         disabled:hover:translate-x-0 disabled:hover:shadow-sm
-                         disabled:hover:border-gray-200 disabled:hover:text-gray-600
-                         transition-all duration-300 active:scale-95"
-            >
-              <svg
-                className="w-4 h-4 transition-transform duration-300
-                             group-hover:-translate-x-0.5 group-disabled:translate-x-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Previous
-            </button>
-
-            {/* Page number buttons */}
-            <div className="flex items-center gap-1">
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                const pageNum =
-                  totalPages <= 5
-                    ? i + 1
-                    : page <= 3
-                      ? i + 1
-                      : page >= totalPages - 2
-                        ? totalPages - 4 + i
-                        : page - 2 + i;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => handlePageChange(pageNum)}
-                    className={`w-9 h-9 rounded-lg text-xs font-bold
-                                transition-all duration-200 active:scale-90
-                                ${page === pageNum
-                        ? "bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-200 scale-105"
-                        : "bg-white border border-gray-200 text-gray-500 hover:border-emerald-400 hover:text-emerald-600 hover:scale-105"
-                      }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page === totalPages}
-              className="group flex items-center gap-2 px-4 py-2 rounded-lg
-                         bg-white border border-gray-200 text-gray-600 text-sm font-medium
-                         shadow-sm hover:border-emerald-400 hover:text-emerald-600
-                         hover:shadow-md hover:translate-x-0.5
-                         disabled:opacity-40 disabled:cursor-not-allowed
-                         disabled:hover:translate-x-0 disabled:hover:shadow-sm
-                         disabled:hover:border-gray-200 disabled:hover:text-gray-600
-                         transition-all duration-300 active:scale-95"
-            >
-              Next
-              <svg
-                className="w-4 h-4 transition-transform duration-300
-                             group-hover:translate-x-0.5 group-disabled:translate-x-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
