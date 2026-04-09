@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBolt, faUser, faRightFromBracket,
-  faChevronDown, faGauge, faPlus,
+  faChevronDown, faGauge, faPlus, faTicket
 } from "@fortawesome/free-solid-svg-icons";
 import { AuthContext } from "../context/AuthContext";
 
@@ -153,6 +153,15 @@ function Navbar() {
                       My Profile
                     </Link>
 
+                    {/* My-tickets */}
+
+                    <Link to="/my-tickets" onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-600
+             hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
+                      <FontAwesomeIcon icon={faTicket} className="text-xs w-3" />
+                      My Tickets
+                    </Link>
+
                     {/* Admin dashboard — admin only */}
                     {user.role === "admin" && (
                       <Link
@@ -233,7 +242,7 @@ function Navbar() {
                 key={link.label}
                 to={link.href}
                 onClick={(e) => { handleNavClick(e, link); setIsMenuOpen(false); }}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+                className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                            text-gray-600 hover:bg-emerald-50 hover:text-emerald-600
                            transition-all duration-200
                            opacity-0 animate-[fadeInUp_0.3s_ease_forwards]"
@@ -248,7 +257,7 @@ function Navbar() {
             {user ? (
               <>
                 {/* Mobile — user info */}
-                <div className="flex items-center gap-3 px-4 py-2">
+                <div className="flex items-center justify-center gap-3 px-4 py-2">
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-emerald-400
                                   flex items-center justify-center text-white text-sm font-bold">
                     {avatar}
@@ -261,7 +270,7 @@ function Navbar() {
 
                 {user.role === "admin" && (
                   <Link to="/admin" onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+                    className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                                text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors">
                     <FontAwesomeIcon icon={faGauge} className="text-xs" />
                     Admin Dashboard
@@ -270,7 +279,7 @@ function Navbar() {
 
                 {user.role === "station_owner" && (
                   <Link to="/add-station" onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+                    className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
                                text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-colors">
                     <FontAwesomeIcon icon={faPlus} className="text-xs" />
                     Add Station
@@ -278,7 +287,7 @@ function Navbar() {
                 )}
 
                 <Link to="/profile" onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
+                  className="flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm font-medium
              text-gray-600 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
                   <FontAwesomeIcon icon={faUser} className="text-xs" />
                   My Profile
@@ -286,7 +295,7 @@ function Navbar() {
 
                 <button
                   onClick={handleLogout}
-                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm
+                  className="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-xl text-sm
                              font-medium text-red-500 hover:bg-red-50 transition-colors"
                 >
                   <FontAwesomeIcon icon={faRightFromBracket} className="text-xs" />

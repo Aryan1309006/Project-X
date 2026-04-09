@@ -22,7 +22,8 @@ import StationDetail from "./components/Stationlist/StationDetail";
 
 /* User */
 import UserProfile from "./components/After login/User/UserProfile";
-import BookSlot from "./components/After login/User/BookSlot";
+import BookSlotPage from "./components/After login/User/BookSlotPage";
+import MyTickets from "./components/After login/User/MyTickets";
 
 /* Station Management */
 import AddStation from "./components/After login/Charging Station/AddStation";
@@ -72,6 +73,11 @@ function App() {
             <StationDetail />
           </ProtectedRoute>
         } />
+        <Route path="/stations/:id/book" element={
+          <ProtectedRoute allowedRoles={["user","station_owner"]}>
+            <BookSlotPage />
+          </ProtectedRoute>
+        } />
 
         {/* ── User (logged in only) ── */}
         <Route path="/profile" element={
@@ -79,9 +85,9 @@ function App() {
             <UserProfile />
           </ProtectedRoute>
         } />
-        <Route path="/book-slot/:id" element={
+        <Route path="/my-tickets" element={
           <ProtectedRoute>
-            <BookSlot />
+            <MyTickets />
           </ProtectedRoute>
         } />
 

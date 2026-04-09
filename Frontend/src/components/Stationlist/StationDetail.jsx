@@ -3,11 +3,11 @@ import {
   faLocationDot, faStar, faBolt, faPlug, faBuilding,
   faWifi, faParking, faUtensils, faShield, faRestroom,
   faCircleCheck, faClock, faIndianRupeeSign, faChevronLeft,
-  faImage, faRoute,
+  faImage, faRoute, faTicket, faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link  } from "react-router-dom";
 import MapView from "./MapView";
 
 const facilityIconMap = {
@@ -261,6 +261,17 @@ function StationDetail() {
                 )}
 
               </div>
+            </div>
+            <div className="mt-2 pt-2 border-t border-gray-100">
+              <p className="text-xs text-gray-400 text-center mb-3 font-medium">
+                Ready to charge? Reserve your slot in advance.
+              </p>
+              <Link to={`/stations/${id}/book`}
+                className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl
+               font-bold text-sm bg-gradient-to-br from-emerald-400 to-teal-600
+               text-white shadow-lg shadow-emerald-100 active:scale-95 transition-all">
+                <FontAwesomeIcon icon={faTicket} /> Book a Charging Slot →
+              </Link>
             </div>
           </div>
 

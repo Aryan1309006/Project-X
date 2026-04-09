@@ -6,6 +6,7 @@ const cors = require("cors");
 const path = require("path");
 const port = process.env.PORT || 8000;
 
+const bookingRoutes = require("./routes/booking.routes");
 const stationRoutes = require("./routes/station.routes");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use("/api/auth",     authRoutes);
 app.use("/api/stations", stationRoutes);
 app.use("/api/users",    userRoutes);
+app.use("/api/bookings", bookingRoutes);
 
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = "Something went wrong" } = err;

@@ -61,7 +61,7 @@ function UserProfile() {
   const role = roleMeta[user?.role] || roleMeta.user;
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pt-24 pb-16 px-4">
+    <div className="min-h-screen bg-gray-50/50 pt-10 pb-16 px-4">
       <div className="max-w-xl mx-auto">
 
         {/* ── Toast ── */}
