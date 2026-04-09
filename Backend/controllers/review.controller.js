@@ -1,6 +1,6 @@
 const Review = require("../models/review.model");
 const EVStation = require("../models/evStation.model");
-const ExpressError = require("../utils/ExpressError");
+const ExpressError = require("../utils/expressError");
 const wrapAsync = require("../utils/wrapAsync");
 
 // GET all reviews for a station

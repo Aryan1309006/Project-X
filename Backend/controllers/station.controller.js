@@ -1,5 +1,5 @@
 const EVStation = require("../models/evStation.model");
-const ExpressError = require("../utils/ExpressError");
+const ExpressError = require("../utils/expressError");
 
 // ── GET STATION BY ID ──
 module.exports.getStationById = async (req, res) => {
