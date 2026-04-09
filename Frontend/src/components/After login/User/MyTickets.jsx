@@ -33,6 +33,11 @@ const formatDate = (d) =>
   });
 
 function QRCode({ upiHandle, amount, ticketId }) {
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchDashboardData();
+  }, []);
   const upiDeep = `upi://pay?pa=${upiHandle}&pn=EV+Bharat&am=${amount}&cu=INR&tn=Ticket-${ticketId}`;
   return (
     <div className="flex flex-col items-center gap-2 py-3">

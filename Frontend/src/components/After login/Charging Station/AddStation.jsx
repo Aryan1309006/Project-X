@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
@@ -14,6 +14,12 @@ const CHARGER_TYPES  = ["CCS", "CCS2", "CHAdeMO", "Type2", "AC", "DC"];
 const AMENITY_OPTIONS = ["wifi", "parking", "cafe", "food", "security", "restroom"];
 
 function AddStation() {
+
+  
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchDashboardData();
+  }, []);
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const { register, handleSubmit, formState: { errors } } = useForm();
