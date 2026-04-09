@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser, faEnvelope, faPhone, faPen,
@@ -9,6 +9,15 @@ import { AuthContext } from "../../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 function UserProfile() {
+
+   const [visible, setVisible] = useState(false);
+
+   useEffect(() => {
+     window.scrollTo(0, 0);
+     const t = setTimeout(() => setVisible(true), 100);
+     return () => clearTimeout(t);
+   }, []);
+
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
 
@@ -59,6 +68,7 @@ function UserProfile() {
     user:          { label: "EV User",       icon: faUser,    color: "bg-emerald-50 text-emerald-600 border-emerald-200" },
   };
   const role = roleMeta[user?.role] || roleMeta.user;
+
 
   return (
     <div className="min-h-screen bg-gray-50/50 pt-10 pb-16 px-4">
