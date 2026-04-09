@@ -32,7 +32,7 @@ app.use(cors({
   origin: [
     "http://localhost:5173",
     "https://shivampimple29-evassistant.hf.space",
-    "https://ev-bharat-mu.vercel.app/",
+    "https://ev-bharat-mu.vercel.app",
   ],
   credentials: true,
 }));
