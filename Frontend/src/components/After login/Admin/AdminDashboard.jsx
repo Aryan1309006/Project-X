@@ -29,36 +29,42 @@ function AdminDashboard() {
   }, []);
 
   const fetchDashboardData = async () => {
-    setLoading(true);
-    try {
-      const headers = { Authorization: `Bearer ${token}` };
+  setLoading(true);
+  try {
+    const headers = { Authorization: `Bearer ${token}` };
 
-      const [stationsRes, usersRes] = await Promise.all([
-        fetch("https://ev-bharat-backend-j5s4.onrender.com/api/stations?page=1", { headers }),
-        fetch("https://ev-bharat-backend-j5s4.onrender.com/api/users?page=1", { headers }),
-      ]);
+    const [stationsRes, usersRes] = await Promise.all([
+      fetch("https://ev-bharat-backend-j5s4.onrender.com/api/stations?page=1", { headers }),
+      fetch("https://ev-bharat-backend-j5s4.onrender.com/api/users?page=1", { headers }),
+    ]);
 
-      const stationsData = await stationsRes.json();
-      const usersData = await usersRes.json();
+    // ← CHECK STATUS before parsing JSON
+    if (!stationsRes.ok) throw new Error(`Stations: ${stationsRes.status}`);
+    if (!usersRes.ok) throw new Error(`Users: ${usersRes.status} — are you admin?`);
 
-      const allStations = stationsData.stations || [];
-      const pending = allStations.filter((s) => s.status === "pending");
-      const verified = allStations.filter((s) => s.isVerified === true);
+    const stationsData = await stationsRes.json();
+    const usersData    = await usersRes.json();
 
-      setStats({
-        totalStations: stationsData.total || 0,
-        pendingStations: pending.length,
-        verifiedStations: verified.length,
-        totalUsers: usersData.total || 0,
-      });
+    const allStations = stationsData.stations || [];
+    const pending  = allStations.filter((s) => s.status === "pending");
+    const verified = allStations.filter((s) => s.isVerified === true);
 
-      setPendingList(pending.slice(0, 5)); // show max 5 on dashboard
-    } catch (err) {
-      console.error("Dashboard fetch error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setStats({
+      totalStations:   stationsData.total || 0,
+      pendingStations: pending.length,
+      verifiedStations: verified.length,
+      totalUsers:      usersData.total || 0,
+    });
+
+    setPendingList(pending.slice(0, 5));
+
+  } catch (err) {
+    console.error("Dashboard fetch error:", err.message);
+    // ← Don't crash — just show zeros and let page render
+  } finally {
+    setLoading(false); // ← Always runs ✅
+  }
+};
 
   const handleApprove = async (id) => {
     setActionLoading(id);

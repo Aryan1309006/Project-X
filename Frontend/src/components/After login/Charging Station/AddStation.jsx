@@ -18,7 +18,6 @@ function AddStation() {
   
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchDashboardData();
   }, []);
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
@@ -26,6 +25,8 @@ function AddStation() {
   const [loading,   setLoading]   = useState(false);
   const [chargers,  setChargers]  = useState([{ type: "CCS2", power: 50, totalPorts: 2, availablePorts: 2 }]);
   const [amenities, setAmenities] = useState([]);
+
+  
 
   // ── Charger helpers ──
   const addCharger = () =>
