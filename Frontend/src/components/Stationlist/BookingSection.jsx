@@ -20,10 +20,10 @@ const PAYMENT_METHODS = [
     logo: "https://cdn.simpleicons.org/phonepe/5F259F" },
   { id: "paytm",    label: "Paytm",       upi: "evbharat@paytm",   color: "#002970",
     logo: "https://cdn.simpleicons.org/paytm/002970" },
-  { id: "bhim",     label: "BHIM UPI",    upi: "evbharat@upi",     color: "#00529C",
-    logo: "https://cdn.simpleicons.org/bhimupi/00529C" },
-  { id: "amazonpay",label: "Amazon Pay",  upi: "evbharat@apl",     color: "#FF9900",
-    logo: "https://cdn.simpleicons.org/amazonpay/FF9900" },
+  // { id: "bhim",     label: "BHIM UPI",    upi: "evbharat@upi",     color: "#00529C",
+  //   logo: "https://seeklogo.com/images/B/bhim-upi-logo-5C4F2D6B5A-seeklogo.com.png" },
+  // { id: "amazonpay",label: "Amazon Pay",  upi: "evbharat@apl",     color: "#FF9900",
+  //   logo: "https://cdn.simpleicons.org/amazonpay/FF9900" },
 ];
 
 // ── Time slots ─────────────────────────────────────────────────────────────────

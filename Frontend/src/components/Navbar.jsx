@@ -293,6 +293,15 @@ function Navbar() {
                   My Profile
                 </Link>
 
+                {/* My-tickets */}
+
+                    <Link to="/my-tickets" onClick={() => setIsUserMenuOpen(false)}
+                      className="flex items-center justify-center gap-2.5 px-4 py-2.5 text-sm text-gray-600
+             hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
+                      <FontAwesomeIcon icon={faTicket} className="text-xs w-3" />
+                      My Tickets
+                    </Link>
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center justify-center gap-3 w-full px-4 py-3 rounded-xl text-sm
