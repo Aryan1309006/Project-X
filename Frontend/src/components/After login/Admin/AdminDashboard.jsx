@@ -67,28 +67,48 @@ function AdminDashboard() {
 };
 
   const handleApprove = async (id) => {
-    setActionLoading(id);
-    try {
-      // ⚠️ Placeholder — wire up your approve endpoint here
-      // await fetch(`https://ev-bharat-backend-j5s4.onrender.com/api/stations/${id}/approve`, {
-      //   method: "PATCH",
-      //   headers: { Authorization: `Bearer ${token}` },
-      // });
-      alert("Approve endpoint not set up yet — wire it in station.routes.js");
-    } finally {
-      setActionLoading(null);
+  setActionLoading(id);
+  try {
+    const res = await fetch(
+      `https://ev-bharat-backend-j5s4.onrender.com/api/stations/${id}/approve`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (res.ok) {
+      setPendingList((prev) => prev.filter((s) => s._id !== id));
+      setStats((prev) => ({
+        ...prev,
+        pendingStations: prev.pendingStations - 1,
+        verifiedStations: prev.verifiedStations + 1,
+      }));
     }
-  };
+  } catch (err) {
+    console.error("Approve failed:", err);
+  } finally {
+    setActionLoading(null);
+  }
+};
 
   const handleReject = async (id) => {
-    setActionLoading(id);
-    try {
-      // ⚠️ Placeholder — wire up your reject endpoint here
-      alert("Reject endpoint not set up yet — wire it in station.routes.js");
-    } finally {
-      setActionLoading(null);
+  setActionLoading(id);
+  try {
+    const res = await fetch(
+      `https://ev-bharat-backend-j5s4.onrender.com/api/stations/${id}/reject`,
+      { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (res.ok) {
+      setPendingList((prev) => prev.filter((s) => s._id !== id));
+      setStats((prev) => ({
+        ...prev,
+        pendingStations: prev.pendingStations - 1,
+      }));
     }
-  };
+  } catch (err) {
+    console.error("Reject failed:", err);
+  } finally {
+    setActionLoading(null);
+  }
+};
+
 
   const statCards = [
     {

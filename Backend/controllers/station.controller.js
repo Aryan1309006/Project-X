@@ -201,3 +201,27 @@ module.exports.createStation = async (req, res) => {
     station,
   });
 };
+
+// ── APPROVE STATION (admin) ──
+module.exports.approveStation = async (req, res) => {
+  const station = await EVStation.findById(req.params.id);
+  if (!station) throw new ExpressError(404, "Station not found");
+
+  station.isVerified = true;
+  station.status = "approved";
+  await station.save();
+
+  res.status(200).json({ success: true, message: "Station approved.", station });
+};
+
+// ── REJECT STATION (admin) ──
+module.exports.rejectStation = async (req, res) => {
+  const station = await EVStation.findById(req.params.id);
+  if (!station) throw new ExpressError(404, "Station not found");
+
+  station.status = "rejected";
+  station.isVerified = false;
+  await station.save();
+
+  res.status(200).json({ success: true, message: "Station rejected.", station });
+};
